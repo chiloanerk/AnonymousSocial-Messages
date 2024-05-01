@@ -1,6 +1,5 @@
 const Message = require('../models/Message');
 const User = require('../models/User');
-const error = require("jsonwebtoken/lib/JsonWebTokenError");
 
 const fetchMessages = async (req, res) => {
     try {
