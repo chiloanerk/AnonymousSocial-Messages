@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
     username: String,
@@ -10,7 +11,9 @@ userSchema.statics.signup = async function (username) {
         throw Error('Username is required');
     }
 
-    return await this.create({ username });
+    const uniqueLink = crypto.randomBytes(6).toString('hex');
+
+    return await this.create({ username, uniqueLink });
 }
 
 module.exports = mongoose.model('User', userSchema);

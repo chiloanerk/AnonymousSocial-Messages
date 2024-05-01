@@ -4,10 +4,11 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
-const indexRoute = require('./routes/indexRoute');
-const usersRoute = require('./routes/userRoute');
-const adminRoute = require('./routes/adminRoute');
-const messageRoute = require('./routes/messageRoute');
+const indexRoute = require('./routes/indexRoutes');
+const usersRoute = require('./routes/userRoutes');
+const adminRoute = require('./routes/adminRoutes');
+const messageRoute = require('./routes/messageRoutes');
+const inboxRoute = require('./routes/inboxRoutes');
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.use('/', indexRoute);
 app.use('/users', usersRoute);
 app.use('/admin', adminRoute);
 app.use('/messages', messageRoute);
+app.use('/inbox', inboxRoute);
+app.use('/send', usersRoute);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

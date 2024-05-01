@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const adminController = require("../controllers/adminController");
+const adminController = require("../src/controllers/adminController");
 
 /* GET users listing. */
 router.post('/signup', adminController.createAdmin);
