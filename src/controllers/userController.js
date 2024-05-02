@@ -4,7 +4,7 @@ const { decrypt, decryptMessage } = require('../functions/cryptoUtils');
 
 const getUsers = async (req, res) => {
     try {
-        const list = await User.find();
+        const list = await User.find().sort('-createdAt');
         res.status(200).json(list);
     } catch (error) {
         res.status(404).json({error: error});
