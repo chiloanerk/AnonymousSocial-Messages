@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Message = require('../models/Message');
+const { decrypt, decryptMessage } = require('../functions/cryptoUtils');
 
 const getUsers = async (req, res) => {
     try {
@@ -14,7 +15,7 @@ const createUser = async (req, res) => {
     const { username } = req.body;
     try {
         const user = await User.signup( username );
-        res.status(201).json({ username, uniqueLink: user.uniqueLink, token: user.token, publicKey: user.publicKey })
+        res.status(201).json({ username, uniqueLink: user.uniqueLink, token: user.token, encryptedPrivateKey: user.encryptedPrivateKey })
     } catch (error) {
         res.status(500).json({error: error.message});
     }
@@ -35,18 +36,22 @@ const sendMessageToUser = async (req, res) => {
 }
 
 const getInbox = async (req, res) => {
-    const user = req.user;
     try {
-        // Find messages sent to the user
+        const user = req.user;
+        const encryptedPrivateKey = user.encryptedPrivateKey;
+        const privateKey = decrypt(encryptedPrivateKey);
+
         const messages = await Message.find({ recipient: user._id }).sort('-createdAt');
-        if (messages.length === 0) {
-            return res.status(404).json({ message: 'No messages found in your inbox' });
-        }
-        res.status(200).json({
-            Info: `Welcome to your inbox ${user.username}`,
-            messages: messages
-        });
+
+        const decryptedMessages = messages.map(message => ({
+            ...message.toObject(),
+            message: decryptMessage(message.message, privateKey)
+        }));
+
+        console.log('Decrypted Messages:', decryptedMessages);
+        res.status(200).json(decryptedMessages);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Failed to fetch messages' });
     }
 }

@@ -1,5 +1,6 @@
 const Message = require('../models/Message');
 const User = require('../models/User');
+const {encryptMessage} = require("../functions/cryptoUtils");
 
 const fetchMessages = async (req, res) => {
     try {
@@ -21,15 +22,17 @@ const sendMessage = async (req, res) => {
         if (!recipient) {
             res.status(404).json({ error: 'Recipient not found' });
         }
+        const encryptedMessage = encryptMessage(message, recipient.publicKey);
+        console.log("Encrypted message: ", encryptedMessage);
 
         const newMessage = new Message({
-            message,
-            recipient: recipient._id
+            recipient: recipient._id,
+            message: encryptedMessage
         });
         await newMessage.save();
         res.status(201).json({ message: 'Message sent successfully '});
     } catch (error) {
-        res.status(500).json({ error: 'Failed to send message' });
+        res.status(500).json({ error: error.message });
     }
 }
 
