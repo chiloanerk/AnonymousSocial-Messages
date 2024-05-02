@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const jwt = require("jsonwebtoken");
-const { generateKeyPair, encrypt } = require('../functions/cryptoUtils');
+const { generateKeyPair, encryptPrivateKey } = require('../functions/cryptoUtils');
 
 const userSchema = new mongoose.Schema({
     username: String,
@@ -17,7 +17,7 @@ userSchema.statics.signup = async function (username) {
 
     const uniqueLink = crypto.randomBytes(6).toString('hex');
     const { publicKey, privateKey } = generateKeyPair();
-    const encryptedPrivateKey = encrypt(privateKey);
+    const encryptedPrivateKey = encryptPrivateKey(privateKey);
     const user = await this.create({ username, uniqueLink, publicKey });
 
     const token = jwt.sign({ _id: user._id, encryptedPrivateKey }, process.env.JWT_SECRET, { expiresIn: '10m' });

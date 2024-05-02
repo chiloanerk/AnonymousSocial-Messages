@@ -26,14 +26,14 @@ const keyBuffer = hexToBuffer(key);
 const iv = crypto.randomBytes(16);
 const algorithm = 'aes-256-cbc';
 
-const encrypt = (text) => {
+const encryptPrivateKey = (text) => {
     let cipher = crypto.createCipheriv( algorithm, keyBuffer, iv);
     let encrypted = cipher.update(text);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
     return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
 }
 
-const decrypt = (text) => {
+const decryptPrivateKey = (text) => {
     let iv = Buffer.from(text.iv, 'hex');
     let encryptedText = Buffer.from(text.encryptedData, 'hex');
     let decipher = crypto.createDecipheriv(algorithm, keyBuffer, iv);
@@ -71,5 +71,5 @@ const decryptMessage = (encryptedMessage, privateKey) => {
 }
 
 module.exports = {
-    generateKeyPair, encrypt, decrypt, encryptMessage, decryptMessage,
+    generateKeyPair, encryptPrivateKey, decryptPrivateKey, encryptMessage, decryptMessage,
 }

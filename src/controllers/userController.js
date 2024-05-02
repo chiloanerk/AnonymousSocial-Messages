@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const Message = require('../models/Message');
-const { decrypt, decryptMessage } = require('../functions/cryptoUtils');
+const { decryptPrivateKey, decryptMessage } = require('../functions/cryptoUtils');
 
 const getUsers = async (req, res) => {
     try {
@@ -39,9 +39,14 @@ const getInbox = async (req, res) => {
     try {
         const user = req.user;
         const encryptedPrivateKey = user.encryptedPrivateKey;
-        const privateKey = decrypt(encryptedPrivateKey);
-
+        const privateKey = decryptPrivateKey(encryptedPrivateKey);
+        const userData = await User.findById(user._id);
+        console.log(userData);
         const messages = await Message.find({ recipient: user._id }).sort('-createdAt');
+        if (messages.length === 0) {
+            res.status(200).json({message: `No messages found ${userData.username}`});
+            return;
+        }
 
         const decryptedMessages = messages.map(message => ({
             ...message.toObject(),
