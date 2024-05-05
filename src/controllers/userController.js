@@ -37,12 +37,12 @@ const sendMessageToUser = async (req, res) => {
 
 const getInbox = async (req, res) => {
     try {
-        const user = req.user;
-        const encryptedPrivateKey = user.encryptedPrivateKey;
+        const {_id, encryptedPrivateKey} = req.user;
         const privateKey = decryptPrivateKey(encryptedPrivateKey);
-        const userData = await User.findById(user._id);
+        const userData = await User.findById(_id, { username: 1 }, null);
         console.log(userData);
-        const messages = await Message.find({ recipient: user._id }).sort('-createdAt');
+        const messages = await Message.find({ recipient: _id }).sort('-createdAt');
+
         if (messages.length === 0) {
             res.status(200).json({message: `No messages found ${userData.username}`});
             return;

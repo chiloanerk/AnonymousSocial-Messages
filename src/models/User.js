@@ -4,8 +4,17 @@ const jwt = require("jsonwebtoken");
 const { generateKeyPair, encryptPrivateKey } = require('../functions/cryptoUtils');
 
 const userSchema = new mongoose.Schema({
-    username: String,
-    uniqueLink: String,
+    username: {
+        type: String,
+        required: true,
+        minLength: 3,
+        maxLength: 30,
+        trim: true
+    },
+    uniqueLink: {
+        type: String,
+        unique: true
+    },
     publicKey: String,
 }, { timestamps: true });
 
@@ -15,14 +24,17 @@ userSchema.statics.signup = async function (username) {
         throw Error('Username is required');
     }
 
-    const uniqueLink = crypto.randomBytes(6).toString('hex');
-    const { publicKey, privateKey } = generateKeyPair();
-    const encryptedPrivateKey = encryptPrivateKey(privateKey);
-    const user = await this.create({ username, uniqueLink, publicKey });
+    try {
+        const uniqueLink = crypto.randomBytes(6).toString('hex');
+        const { publicKey, privateKey } = generateKeyPair();
+        const encryptedPrivateKey = encryptPrivateKey(privateKey);
+        const user = await this.create({ username, uniqueLink, publicKey });
+        const token = jwt.sign({ _id: user._id, encryptedPrivateKey }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
-    const token = jwt.sign({ _id: user._id, encryptedPrivateKey }, process.env.JWT_SECRET, { expiresIn: '10m' });
-
-    return { user, uniqueLink, token, publicKey };
+        return { user, uniqueLink, token, publicKey };
+    } catch (error) {
+        throw error;
+    }
 }
 
 module.exports = mongoose.model('User', userSchema);
