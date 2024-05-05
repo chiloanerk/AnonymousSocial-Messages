@@ -23,7 +23,6 @@ const sendMessage = async (req, res) => {
             res.status(404).json({ error: 'Recipient not found' });
         }
         const encryptedMessage = encryptMessage(message, recipient.publicKey);
-        console.log("Encrypted message: ", encryptedMessage);
 
         const newMessage = new Message({
             recipient: recipient._id,

@@ -4,11 +4,8 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
-const indexRoute = require('./routes/indexRoutes');
-const usersRoute = require('./routes/userRoutes');
-const adminRoute = require('./routes/adminRoutes');
-const messageRoute = require('./routes/messageRoutes');
-const inboxRoute = require('./routes/inboxRoutes');
+const indexRoutes = require('./routes/indexRoutes');
+const apiRoutes = require('./routes/apiRoutes');
 
 const app = express();
 
@@ -22,12 +19,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRoute);
-app.use('/users', usersRoute);
-app.use('/admin', adminRoute);
-app.use('/messages', messageRoute);
-app.use('/inbox', inboxRoute);
-app.use('/send', usersRoute);
+app.use('/', indexRoutes);
+app.use('/api', apiRoutes);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -35,7 +29,7 @@ app.use(function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function(err, req, res) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
