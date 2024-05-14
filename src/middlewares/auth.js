@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken")
 
-const auth = async (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
     const { authorization } = req.headers;
     if (!authorization) {
         return res.status(401).json({error: "No token provided"});
@@ -16,4 +16,4 @@ const auth = async (req, res, next) => {
     }
 }
 
-module.exports = auth;
+module.exports = authenticateToken();

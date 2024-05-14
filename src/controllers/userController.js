@@ -14,6 +14,10 @@ const getUsers = async (req, res) => {
 const createUser = async (req, res) => {
     const { username } = req.body;
     try {
+        const existingUser = await User.findOne(username);
+        if (existingUser) {
+            return res.json({message: "Username already exists"})
+        }
         const user = await User.signup( username );
         res.status(201).json({ username, uniqueLink: user.uniqueLink, token: user.token, encryptedPrivateKey: user.encryptedPrivateKey })
     } catch (error) {
